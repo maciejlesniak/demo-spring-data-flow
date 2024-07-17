@@ -1,0 +1,36 @@
+== Spring Data Flow demo
+
+=== Components
+
+==== Skipper Server
+
+Skipper consists of a server application that exposes an HTTP API. A shell application provides easy-to-use https://docs.spring.io/spring-cloud-skipper/docs/2.11.3/reference/htmlsingle/#skipper-commands-reference[commands] to interact with the server. The server uses a relational database to store state. Documentation to call the HTTP API is available in the https://docs.spring.io/spring-cloud-skipper/docs/2.11.3/reference/htmlsingle/#api-guide[REST API Guide].;
+
+* Locally it runs on `7577` port;
+* Console init: `make skipper-shell`;
+* https://docs.spring.io/spring-cloud-skipper/docs/2.11.3/reference/htmlsingle/#skipper-commands-reference[console commands]
+
+The main https://docs.spring.io/spring-cloud-skipper/docs/2.11.3/reference/htmlsingle/#_concepts[concepts] are Platforms, Packages, Repositories, Releases, and Release Workflows:
+
+Platforms:: are where your apps run;
+Packages:: define the basic recipe for describing what to install on a platform;
+Repositories:: are where package metadata and zip files are hosted. Repositories can either be 'local' or 'remote';
+Releases:: are created in Skipper after you install, upgrade, or rollback a package;
++
+
+NOTE: The default configuration of Skipper deploys apps to the local machine.
+
+Release Workflows:: are the steps taken to upgrade or rollback an application from one version to another;
+
+
+==== Dataflow Server
+
+
+app-import-stream::
+
+app-import-task::
+
+kafka-broker & zookeeper::
+
+postgres::
+
