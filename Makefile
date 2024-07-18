@@ -21,21 +21,27 @@ download:
 	wget -O spring-cloud-dataflow-shell.jar 	$(DATA_FLOW_CLI_URL)
 	wget -O spring-cloud-skipper-shell.jar 		$(SKIPPER_CLI_URL)
 
-up:
+compose-up:
 	docker-compose \
     	-f docker-compose.yml \
     	-f docker-compose-"$(BROKER)".yml \
     	-f docker-compose-"$(DATABASE)".yml \
     	up -d
-	while ! curl $(DATA_FLOW_DASHBOARD_URL) </dev/null; do sleep 3; done
-	open $(DATA_FLOW_DASHBOARD_URL)
 
-down:
+compose-down:
 	docker-compose \
     	-f docker-compose.yml \
     	-f docker-compose-"$(BROKER)".yml \
     	-f docker-compose-"$(DATABASE)".yml \
     	down
+
+ui:
+	@while ! curl $(DATA_FLOW_DASHBOARD_URL) </dev/null; do sleep 3; printf "Waiting..."; done
+	open $(DATA_FLOW_DASHBOARD_URL)
+
+up: compose-up ui
+
+down: compose-down
 
 clean-compose:
 	rm \
@@ -48,9 +54,10 @@ docker-rm:
 	docker rm $$(docker ps -a -q)
 
 dataflow-shell:
-	while ! curl $(DATA_FLOW_DASHBOARD_URL) </dev/null; do sleep 3; done
+	@while ! curl $(DATA_FLOW_DASHBOARD_URL) </dev/null; do sleep 3; done
 	java -jar spring-cloud-dataflow-shell.jar
 
 skipper-shell:
-	while ! curl $(SKIPPER_API_URL) </dev/null; do sleep 3; done
+	@while ! curl $(SKIPPER_API_URL) </dev/null; do sleep 3; done
 	java -jar spring-cloud-skipper-shell.jar
+

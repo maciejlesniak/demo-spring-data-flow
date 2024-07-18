@@ -3,3 +3,4 @@
 docker-compose*.yml
 *.jar
 *.log
+doc/*.html

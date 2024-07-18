@@ -1,0 +1,15 @@
+== Dataflow Server
+
+The Data Flow Server is responsible for
+
+* Parsing the stream and batch job definitions based on a Domain-Specific Language (DSL).
+* Validating and persisting stream, task, and batch job definitions.
+* Registering artifacts such as jar and Docker images to names used in the DSL.
+* Deploying batch jobs to one or more platforms.
+* Delegating job scheduling to a platform.
+* Querying detailed task and batch job execution history.
+* Adding configuration properties to streams that configure messaging inputs and outputs as well as passing along deployment properties (such as the initial number of instances, memory requirements, and data partitioning).
+* Delegating stream deployment to Skipper.
+* Auditing actions (such as stream creation, deployment, and undeployment and batch creation, launching, and deletion).
+* Providing stream and batch job DSL tab-completion features.
+
