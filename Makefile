@@ -5,41 +5,68 @@ export SKIPPER_VERSION=2.11.3
 
 ## WARNING: Spring Cloud Data Flow defaults to Java 8 when running applications
 export BP_JVM_VERSION=-jdk17
+export HOST_MOUNT_PATH=.data/scdf
 
 DOWNLOAD_URL_BASE		:=https://raw.githubusercontent.com/spring-cloud/spring-cloud-dataflow/main/src/docker-compose
 DATA_FLOW_CLI_URL		:=https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-dataflow-shell/$(DATAFLOW_VERSION)/spring-cloud-dataflow-shell-$(DATAFLOW_VERSION).jar
 SKIPPER_CLI_URL			:=https://repo.maven.apache.org/maven2/org/springframework/cloud/spring-cloud-skipper-shell/$(SKIPPER_VERSION)/spring-cloud-skipper-shell-$(SKIPPER_VERSION).jar
 DATA_FLOW_DASHBOARD_URL	:=http://localhost:9393/dashboard
 SKIPPER_API_URL			:=http://localhost:7577/api
+CF_CENTER_DASHBOARD_URL	:=http://localhost:9021/
 BROKER					:=kafka
 DATABASE				:=postgres
 
 download:
-	wget -O docker-compose.yml 					$(DOWNLOAD_URL_BASE)/docker-compose.yml;
-	wget -O docker-compose-"$(BROKER)".yml 		$(DOWNLOAD_URL_BASE)/docker-compose-"${BROKER}".yml;
-	wget -O docker-compose-"$(DATABASE)".yml 	$(DOWNLOAD_URL_BASE)/docker-compose-"${DATABASE}".yml;
+	wget -O compose-scdf.yml 					$(DOWNLOAD_URL_BASE)/docker-compose.yml;
+	wget -O compose-"$(DATABASE)".yml 			$(DOWNLOAD_URL_BASE)/docker-compose-"${DATABASE}".yml;
+#	wget -O compose-"$(BROKER)".yml 			$(DOWNLOAD_URL_BASE)/docker-compose-"${BROKER}".yml;
+	wget -O compose-kafka.yml 					https://raw.githubusercontent.com/confluentinc/cp-all-in-one/7.6.2-post/cp-all-in-one-kraft/docker-compose.yml
 	wget -O spring-cloud-dataflow-shell.jar 	$(DATA_FLOW_CLI_URL)
 	wget -O spring-cloud-skipper-shell.jar 		$(SKIPPER_CLI_URL)
 
+compose-up-kafka:
+	docker-compose \
+  		-f compose-"$(BROKER)".yml \
+  		up
+
+compose-up-db:
+	docker-compose \
+		-f compose-"$(DATABASE)".yml \
+		up
+
 compose-up:
 	docker-compose \
-    	-f docker-compose.yml \
-    	-f docker-compose-"$(BROKER)".yml \
-    	-f docker-compose-"$(DATABASE)".yml \
-    	up -d
+    	-f compose-"$(BROKER)".yml \
+    	-f compose-"$(DATABASE)".yml \
+    	-f compose-scdf.yml \
+    	-f compose-overrides.yml \
+    	up -d \
+    	broker schema-registry control-center ksqldb-server ksqldb-cli  ksql-datagen rest-proxy \
+    	postgres \
+    	dataflow-server skipper-server
+
+compose-import:
+	docker-compose \
+        -f docker-compose.yml \
+        up -d app-import-stream app-import-task
 
 compose-down:
 	docker-compose \
-    	-f docker-compose.yml \
-    	-f docker-compose-"$(BROKER)".yml \
-    	-f docker-compose-"$(DATABASE)".yml \
+    	-f compose-"$(BROKER)".yml \
+    	-f compose-"$(DATABASE)".yml \
+    	-f compose-scdf.yml \
+    	-f compose-overrides.yml \
     	down
 
-ui:
+ui-scdf:
 	@while ! curl $(DATA_FLOW_DASHBOARD_URL) </dev/null; do sleep 3; printf "Waiting..."; done
 	open $(DATA_FLOW_DASHBOARD_URL)
 
-up: compose-up ui
+ui-cf-center:
+	@while ! curl $(CF_CENTER_DASHBOARD_URL) </dev/null; do sleep 3; printf "Waiting..."; done
+	open $(CF_CENTER_DASHBOARD_URL)
+
+up: compose-up ui-scdf ui-cf-center
 
 down: compose-down
 

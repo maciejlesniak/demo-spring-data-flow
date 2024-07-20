@@ -10,10 +10,10 @@ Spring Cloud Data Flow supports a range of data processing use cases, from ETL t
 
 include::features.adoc[leveloffset=0]
 
-== Components
+== Components for streaming
 
-.Server components according to https://dataflow.spring.io/docs/concepts/architecture/
-image::https://dataflow.spring.io/static/19e89c2894aa4586aec3336ac4e6954b/5105f/arch-overview.webp[align=center]
+.Server components according to https://dataflow.spring.io/docs/stream-developer-guides/getting-started/stream/
+image::architecture-sdf.png[align=center]
 
 NOTE: The Data Flow Server and Skipper Server need to have an RDBMS installed. By default, the servers use an embedded H2 database. You can configure the servers to use external databases. The supported databases are H2, HSQLDB, MariaDB, Oracle, Postgresql, DB2, and SqlServer. The schemas are automatically created when each server starts.
 
