@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: demo-publisher-kafka
+  cloud:
+    stream:
+      bindings:
+        demoData-out-0:
+          destination: demo-data-raw

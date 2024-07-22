@@ -1,0 +1,6 @@
+[submodule "spring-functions-catalog"]
+	path = spring-functions-catalog
+	url = https://github.com/spring-cloud/spring-functions-catalog.git
+[submodule "stream-applications"]
+	path = stream-applications
+	url = git@github.com:spring-cloud/stream-applications.git

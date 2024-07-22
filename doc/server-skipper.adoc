@@ -3,6 +3,9 @@
 The Skipper Server is responsible for:
 
 * Deploying streams to one or more platforms.
++
+NOTE: The default platform is a `localhost` (so in docker environment application starts as a separate JVM process).
+
 * Upgrading and rolling back streams on one or more platforms by using a state machine-based blue/green update strategy.
 * Storing the history of each stream's manifest file (which represents the final description of what applications have been deployed).
 

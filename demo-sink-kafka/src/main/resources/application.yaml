@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: demo-sink-kafka
+  cloud:
+    stream:
+      bindings:
+        messageLogger-in-0:
+          destination: demo-data-processed

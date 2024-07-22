@@ -25,23 +25,21 @@ download:
 	wget -O spring-cloud-skipper-shell.jar 		$(SKIPPER_CLI_URL)
 
 compose-up-kafka:
-	docker-compose \
-  		-f compose-"$(BROKER)".yml \
-  		up
+	docker-compose -f compose-$(BROKER).yml \
+  		up -d broker schema-registry control-center ksqldb-server ksqldb-cli rest-proxy
 
 compose-up-db:
-	docker-compose \
-		-f compose-"$(DATABASE)".yml \
-		up
+	docker-compose -f compose-$(DATABASE).yml \
+		up -d
 
 compose-up:
 	docker-compose \
-    	-f compose-"$(BROKER)".yml \
-    	-f compose-"$(DATABASE)".yml \
+    	-f compose-$(BROKER).yml \
+    	-f compose-$(DATABASE).yml \
     	-f compose-scdf.yml \
     	-f compose-overrides.yml \
     	up -d \
-    	broker schema-registry control-center ksqldb-server ksqldb-cli  ksql-datagen rest-proxy \
+    	broker schema-registry control-center ksqldb-server ksqldb-cli rest-proxy \
     	postgres \
     	dataflow-server skipper-server
 
@@ -52,8 +50,8 @@ compose-import:
 
 compose-down:
 	docker-compose \
-    	-f compose-"$(BROKER)".yml \
-    	-f compose-"$(DATABASE)".yml \
+    	-f compose-$(BROKER).yml \
+    	-f compose-$(DATABASE).yml \
     	-f compose-scdf.yml \
     	-f compose-overrides.yml \
     	down
@@ -73,8 +71,8 @@ down: compose-down
 clean-compose:
 	rm \
 		docker-compose.yml \
-		docker-compose-"$(BROKER)".yml \
-		docker-compose-"$(DATABASE)".yml
+		docker-compose-$(BROKER).yml \
+		docker-compose-$(DATABASE).yml
 
 docker-rm:
 	docker stop $$(docker ps -a -q)
@@ -88,3 +86,7 @@ skipper-shell:
 	@while ! curl $(SKIPPER_API_URL) </dev/null; do sleep 3; done
 	java -jar spring-cloud-skipper-shell.jar
 
+mvn-package-demo:
+	cd demo-processor-kafka; mvn clean package; cp target/demo-processor-kafka-0.0.1-SNAPSHOT.jar ../.data/scdf/
+	cd demo-publisher-kafka; mvn clean package; cp target/demo-publisher-kafka-0.0.1-SNAPSHOT.jar ../.data/scdf/
+	cd demo-sink-kafka; mvn clean package; cp target/demo-sink-kafka-0.0.1-SNAPSHOT.jar ../.data/scdf/
