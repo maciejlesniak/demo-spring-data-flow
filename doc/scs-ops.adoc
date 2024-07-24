@@ -1,0 +1,125 @@
+== Producing and consuming messages
+
+====
+Official documentation of Spring Cloud Function: https://cloud.spring.io/spring-cloud-function/reference/html/spring-cloud-function.html#_programming_model
+====
+
+Spring Cloud Function embraces and builds on top of the 3 core functional interfaces defined by Java and available to us since Java 8.
+
+* java.util.function.Supplier<O>
+* java.util.function.Function<I, O>
+* java.util.function.Consumer<I>
+
+=== Supplier (source)
+
+.Supplier example
+[source,java]
+----
+@Bean
+public Supplier<Date> date() {
+    return () -> new Date(12345L);
+}
+----
+
+Supplier is in its own category when it comes to triggering.
+Since it is, by definition, the source (the origin) of the data, it does not subscribe to any in-bound destination and, therefore, has to be triggered by some other mechanism(s).
+
+The framework provides a default _polling mechanism_ that will trigger the invocation of the supplier (i.e. its `get()` function) and by default it will do so every second.
+
+The polling mechanism could be configured
+
+NOTE: Supplier could be *imperative* or *reactive* and which directly relates to the triggering.
+Reactive suppliers are triggered once, whereas imperative ones use a polling mechanism.
+See https://docs.spring.io/spring-cloud-stream/reference/spring-cloud-stream/producing-and-consuming-messages.html#polling-configuration-properties[documentation for the polling mechanism].
+
+There are two ways to define a message key:
+
+* using `producer.partition-key-expression` or
+* (in case of Kafka -- https://docs.spring.io/spring-cloud-stream/reference/kafka/kafka-binder/partitions.html[see doc]) directly add a key to an outbound record.
+
+.Example of using `producer.partition-key-expression`
+[source,yaml]
+----
+spring:
+  cloud:
+    stream:
+      bindings:
+        demoData-out-0:
+          destination: demo-data-raw
+          producer:
+            partition-key-expression: headers['partitionKey'] # <1>
+            partition-count: 3
+----
+
+<1> Partition expression that instructs Spring Cloud Stream to use a Message header `partitionKey` to calculate a Kafka partition (Kafka key will not be set)
+
+.Example of adding a Kafka key to outbound record
+[source,java]
+----
+@Bean
+public Supplier<Message<String>> demoData() {
+    return () -> {
+        var ts = Instant.now().toEpochMilli();
+        var key = ((Long) (ts % 3)).toString().getBytes();
+        var payload = "Demo message; ts: %d".formatted(ts);
+        LOG.info("Message produced {}", payload);
+
+        return MessageBuilder
+                .withPayload(payload)
+                .setHeader(KafkaHeaders.KEY, key) // <1>
+                .build();
+    };
+}
+----
+
+<1> Adding a key directly to the message that will appear as a Kafka message key and not be visible in message headers
+
+=== Function (processor)
+
+.Function example
+[source,java]
+----
+@Bean
+public Function<String, String> toUpperCase() {
+    return s -> s.toUpperCase();
+}
+----
+
+You can compose one or more functions to pipelines, so messages flow through all in given order, but code stays separated.
+Consider the below configuration example that uses two functions beans: `toUpperCase` and `addStaticString`.
+
+[source,yaml]
+----
+spring:
+  cloud:
+    function:
+      definition: toUpperCase|addStaticString                   # <1>
+    stream:
+      function:
+        bindings:
+          toUpperCase|addStaticString-in-0: processed-data-in   # <2>
+          toUpperCase|addStaticString-out-0: processed-data-out # <2>
+      bindings:
+        processed-data-in:                                      # <3>
+          destination: demo-data-raw
+        processed-data-out:                                     # <3>
+          destination: demo-data-processed
+----
+
+<1> function pipeline definition using Spring bean names
+<2> re-naming (binding) long function names to easy to use names (optional configuration)
+<3> using re-named function for Spring Cloud Stream binding
+
+=== Consumer (sink)
+
+.Consumer example
+[source,java]
+----
+@Bean
+public Consumer<String> sink() {
+    return System.out::println;
+}
+----
+
+Additional topics: message routing
+

@@ -1,0 +1,15 @@
+== Application naming
+
+Applications follow a naming convention: <functionality>-<type>-<binder>.
+For example, `rabbit-sink-kafka` is a Rabbit sink that uses the Kafka binder that is running with Kafka as the middleware.
+
+Available Spring Cloud Stream application types:
+
+* `source` that connects to an external resource to poll and receive data that is published to the default “output” channel;
+* `processor` that receives data from an “input” channel and processes it, sending the result on the default “output” channel;
+* `sink` that connects to an external resource to send the received data to the default “input” channel.
+
+Available out-of-the-box binders:
+
+* `kafka`
+* `rabbit`

@@ -1,0 +1,42 @@
+== Testing
+
+====
+Documentation on Spring Cloud Stream binder testing: https://docs.spring.io/spring-cloud-stream/reference/spring-cloud-stream/spring_integration_test_binder.html
+====
+
+To enable test Spring Cloud Stream binder, just annotate class or test configuration with `@EnableTestBinder`. Then, you can use classes that are able to send and receive data:
+
+* InputDestination
+* OutputDestination
+
+.Simple test example
+[source,java]
+----
+@SpringBootTest
+@EnableTestBinder
+class DemoProcessorKafkaApplicationTests {
+
+    @Autowired
+    private InputDestination input;
+
+    @Autowired
+    private OutputDestination output;
+
+    @Test
+    void processorFunction_shouldUpecaseAndAddStaticString_whenStringGiven() {
+
+        // given
+        var inputMessage = new GenericMessage<>("hello");
+
+        // when
+        input.send(inputMessage);
+        var receivedMessageBytes = output.receive().getPayload();
+
+        // then
+        assertEquals("HELLO -- additional string in lower case", new String(receivedMessageBytes));
+    }
+
+}
+----
+
+NOTE: Destination could be used also in `Supplier` and `Consumer` testing scenarios.

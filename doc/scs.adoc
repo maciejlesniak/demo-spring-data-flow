@@ -1,0 +1,18 @@
+= Spring Cloud Stream application
+:toc: left
+:toclevels: 3
+
+
+https://dataflow.spring.io/docs/stream-developer-guides/
+
+Standard starter applications https://github.com/spring-cloud/stream-applications/blob/main/README.adoc[GIT repository] consists of pre-build source, processor and sink applications, which are build upon https://github.com/spring-cloud/spring-functions-catalog[Spring Cloud Function applications].
+
+include::scs-app-naming.adoc[leveloffset=0]
+
+include::scs-app-model.adoc[leveloffset=0]
+
+include::scs-ops.adoc[leveloffset=0]
+
+include::scs-errors.adoc[leveloffset=0]
+
+include::scs-testing.adoc[leveloffset=0]
