@@ -1,4 +1,4 @@
-package pl.sparkidea.springcloud.demo.publisherkafka;
+package pl.sparkidea.springcloud.demo.sourcekafka;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,12 +10,12 @@ import java.time.Instant;
 import java.util.function.Supplier;
 
 @SpringBootApplication
-public class DemoPublisherKafkaApplication {
+public class DemoSourceKafkaApplication {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DemoPublisherKafkaApplication.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DemoSourceKafkaApplication.class);
 
     public static void main(String[] args) {
-        SpringApplication.run(DemoPublisherKafkaApplication.class, args);
+        SpringApplication.run(DemoSourceKafkaApplication.class, args);
     }
 
     @Bean
@@ -23,11 +23,6 @@ public class DemoPublisherKafkaApplication {
         return () -> {
             var message = "Demo message; ts: %d".formatted(Instant.now().toEpochMilli());
             LOG.info(message);
-            try {
-                Thread.sleep(10_000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
             return message;
         };
     }

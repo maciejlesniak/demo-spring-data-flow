@@ -6,3 +6,10 @@ spring:
       bindings:
         demoData-out-0:
           destination: demo-data-raw
+      kafka:
+        binder:
+          brokers:
+            - localhost:9092
+  integration:
+    poller:
+      fixed-rate: 1s

@@ -8,3 +8,7 @@ spring:
           destination: demo-data-raw
         toUpperCase-out-0:
           destination: demo-data-processed
+      kafka:
+        binder:
+          brokers:
+            - localhost:9092

@@ -6,3 +6,7 @@ spring:
       bindings:
         messageLogger-in-0:
           destination: demo-data-processed
+      kafka:
+        binder:
+          brokers:
+            - localhost:9092

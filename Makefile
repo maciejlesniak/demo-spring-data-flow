@@ -88,5 +88,5 @@ skipper-shell:
 
 mvn-package-demo:
 	cd demo-processor-kafka; mvn clean package; cp target/demo-processor-kafka-0.0.1-SNAPSHOT.jar ../.data/scdf/
-	cd demo-publisher-kafka; mvn clean package; cp target/demo-publisher-kafka-0.0.1-SNAPSHOT.jar ../.data/scdf/
+	cd demo-source-kafka; mvn clean package; cp target/demo-source-kafka-0.0.1-SNAPSHOT.jar ../.data/scdf/
 	cd demo-sink-kafka; mvn clean package; cp target/demo-sink-kafka-0.0.1-SNAPSHOT.jar ../.data/scdf/
