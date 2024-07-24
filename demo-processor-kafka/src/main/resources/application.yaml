@@ -2,13 +2,20 @@ spring:
   application:
     name: demo-processor-kafka
   cloud:
+    function:
+      definition: toUpperCase|addStaticString
     stream:
+      function:
+        bindings:
+          toUpperCase|addStaticString-in-0: processed-data-in
+          toUpperCase|addStaticString-out-0: processed-data-out
       bindings:
-        toUpperCase-in-0:
+        processed-data-in:
           destination: demo-data-raw
-        toUpperCase-out-0:
+        processed-data-out:
           destination: demo-data-processed
       kafka:
         binder:
           brokers:
             - localhost:9092
+

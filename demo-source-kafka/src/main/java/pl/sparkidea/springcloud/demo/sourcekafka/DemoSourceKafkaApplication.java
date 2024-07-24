@@ -5,6 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 
 import java.time.Instant;
 import java.util.function.Supplier;
@@ -19,11 +22,18 @@ public class DemoSourceKafkaApplication {
     }
 
     @Bean
-    public Supplier<String> demoData() {
+    public Supplier<Message<String>> demoData() {
         return () -> {
-            var message = "Demo message; ts: %d".formatted(Instant.now().toEpochMilli());
-            LOG.info(message);
-            return message;
+            var ts = Instant.now().toEpochMilli();
+            var key = ((Long) (ts % 3)).toString().getBytes();
+            var payload = "Demo message; ts: %d".formatted(ts);
+            LOG.info("Message produced {}", payload);
+
+            return MessageBuilder
+                    .withPayload(payload)
+                    .setHeader(KafkaHeaders.KEY, key)
+                    .setHeader("partitionKey", key)
+                    .build();
         };
     }
 

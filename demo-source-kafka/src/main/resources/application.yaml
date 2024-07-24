@@ -6,10 +6,13 @@ spring:
       bindings:
         demoData-out-0:
           destination: demo-data-raw
+          producer:
+            partition-key-expression: headers['partitionKey']
+            partition-count: 3
       kafka:
         binder:
           brokers:
             - localhost:9092
   integration:
     poller:
-      fixed-rate: 1s
+      fixed-rate: 3s

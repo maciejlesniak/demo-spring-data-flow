@@ -4,7 +4,8 @@ Based on official Spring Boot / Cloud documentation: https://spring.io/projects
 
 Microservice based Streaming and Batch data processing for Cloud Foundry and Kubernetes.
 
-Spring Cloud Data Flow provides tools to create complex topologies for streaming and batch data pipelines. The data pipelines consist of Spring Boot apps, built using the Spring Cloud Stream or Spring Cloud Task microservice frameworks.
+Spring Cloud Data Flow provides tools to create complex topologies for streaming and batch data pipelines.
+The data pipelines consist of Spring Boot apps, built using the Spring Cloud Stream or Spring Cloud Task microservice frameworks.
 
 Spring Cloud Data Flow supports a range of data processing use cases, from ETL to import/export, event streaming, and predictive analytics.
 
@@ -15,24 +16,27 @@ include::features.adoc[leveloffset=0]
 .Server components according to https://dataflow.spring.io/docs/stream-developer-guides/getting-started/stream/
 image::architecture-sdf.png[align=center]
 
-NOTE: The Data Flow Server and Skipper Server need to have an RDBMS installed. By default, the servers use an embedded H2 database. You can configure the servers to use external databases. The supported databases are H2, HSQLDB, MariaDB, Oracle, Postgresql, DB2, and SqlServer. The schemas are automatically created when each server starts.
+NOTE: The Data Flow Server and Skipper Server need to have an RDBMS installed.
+By default, the servers use an embedded H2 database.
+You can configure the servers to use external databases.
+The supported databases are H2, HSQLDB, MariaDB, Oracle, Postgresql, DB2, and SqlServer.
+The schemas are automatically created when each server starts.
 
 include::server-dataflow.adoc[leveloffset=+1]
 include::server-skipper.adoc[leveloffset=+1]
 
-kafka-broker & zookeeper
-postgres
+kafka-broker & zookeeper postgres
 
 == Spring Cloud Stream application
 
 https://dataflow.spring.io/docs/stream-developer-guides/
 
-
 Standard starter applications https://github.com/spring-cloud/stream-applications/blob/main/README.adoc[GIT repository] consists of pre-build source, processor and sink applications, which are build upon https://github.com/spring-cloud/spring-functions-catalog[Spring Cloud Function applications].
 
 === Application naming
 
-Applications follow a naming convention: <functionality>-<type>-<binder>. For example, `rabbit-sink-kafka` is a Rabbit sink that uses the Kafka binder that is running with Kafka as the middleware.
+Applications follow a naming convention: <functionality>-<type>-<binder>.
+For example, `rabbit-sink-kafka` is a Rabbit sink that uses the Kafka binder that is running with Kafka as the middleware.
 
 Available Spring Cloud Stream application types:
 
@@ -78,6 +82,7 @@ Destination binder:: a "driver" that delivers and retrieves messages to the mess
     </dependency>
 </dependencies>
 ----
+
 <1> Spring Cloud Stream abstractions
 <2> destination binder
 
@@ -97,6 +102,7 @@ spring:
           brokers:                      # <2>
             - "broker:9092"
 ----
+
 <1> binds Kafka topic "demo-data-raw" with a function "demoData" output
 <2> Kafka broker configuration
 
@@ -109,21 +115,26 @@ public Supplier<String> demoData() {        // <1>
     return () -> "Demo message; ts: %d".formatted(Instant.now().toEpochMilli());
 }
 ----
+
 <1> a function that is used for binding as "demoData-out-0"
 
 === Native consumer groups support
 
 Each consumer binding can use the `spring.cloud.stream.bindings.<bindingName>.group` property to specify a group name.
 
-All groups that subscribe to a given destination receive a copy of published data, but only one member of each group receives a given message from that destination. By default, when a group is not specified, Spring Cloud Stream assigns the application to an *anonymous and independent single-member consumer group* that is in a publish-subscribe relationship with all other consumer groups.
+All groups that subscribe to a given destination receive a copy of published data, but only one member of each group receives a given message from that destination.
+By default, when a group is not specified, Spring Cloud Stream assigns the application to an *anonymous and independent single-member consumer group* that is in a publish-subscribe relationship with all other consumer groups.
 
 NOTE: More info: https://docs.spring.io/spring-cloud-stream/reference/spring-cloud-stream/consumer-groups.html
 
 === Native partitioning support
 
-Spring Cloud Stream provides support for partitioning data between multiple instances of a given application. Spring Cloud Stream provides a common abstraction for implementing partitioned processing use cases in a uniform fashion. Partitioning can thus be used whether the broker itself is naturally partitioned (for example, Kafka) or not (for example, RabbitMQ).
+Spring Cloud Stream provides support for partitioning data between multiple instances of a given application.
+Spring Cloud Stream provides a common abstraction for implementing partitioned processing use cases in a uniform fashion.
+Partitioning can thus be used whether the broker itself is naturally partitioned (for example, Kafka) or not (for example, RabbitMQ).
 
-Partitioning is a critical concept in stateful processing, where it is critical (for either performance or consistency reasons) to ensure that all related data is processed together. For example, in the time-windowed average calculation example, it is important that all measurements from any given sensor are processed by the same application instance.
+Partitioning is a critical concept in stateful processing, where it is critical (for either performance or consistency reasons) to ensure that all related data is processed together.
+For example, in the time-windowed average calculation example, it is important that all measurements from any given sensor are processed by the same application instance.
 
 WARNING: To set up a partitioned processing scenario, you must configure both the data-producing and the data-consuming ends.
 
@@ -166,7 +177,9 @@ input - <functionName> + -in- + <index>
 output - <functionName> + -out- + <index>
 ----
 
-The in and out correspond to the type of binding (such as input or output). The index is the index of the input or output binding. It is always 0 for a typical single input/output function, so it’s only relevant for functions with multiple input and output arguments.
+The in and out correspond to the type of binding (such as input or output).
+The index is the index of the input or output binding.
+It is always 0 for a typical single input/output function, so it’s only relevant for functions with multiple input and output arguments.
 
 .Example of simple functional binding
 [source,yaml,line-comment=#]
@@ -178,6 +191,7 @@ spring:
         demoData-out-0:                  # <1>
           destination: "demo-data-raw"
 ----
+
 <1> binds Kafka topic "demo-data-raw" with a function "demoData" output
 
 You can also map an implicit binding name (e.g. `demoData-out-0`) to an explicit binding name (e.g. `raw`) using
@@ -199,6 +213,7 @@ spring:
         raw:                            # <2>
           destination: demo-data-raw
 ----
+
 <1> implicit binding name to an explicit binding name
 <2> explicit binding name destination configuration
 
@@ -227,13 +242,58 @@ public Supplier<Date> date() {
 }
 ----
 
-Supplier is in its own category when it comes to triggering. Since it is, by definition, the source (the origin) of the data, it does not subscribe to any in-bound destination and, therefore, has to be triggered by some other mechanism(s).
+Supplier is in its own category when it comes to triggering.
+Since it is, by definition, the source (the origin) of the data, it does not subscribe to any in-bound destination and, therefore, has to be triggered by some other mechanism(s).
 
 The framework provides a default _polling mechanism_ that will trigger the invocation of the supplier (i.e. its `get()` function) and by default it will do so every second.
 
 The polling mechanism could be configured
 
-NOTE: Supplier could be *imperative* or *reactive* and which directly relates to the triggering. Reactive suppliers are triggered once, whereas imperative ones use a polling mechanism. See https://docs.spring.io/spring-cloud-stream/reference/spring-cloud-stream/producing-and-consuming-messages.html#polling-configuration-properties[documentation for the polling mechanism].
+NOTE: Supplier could be *imperative* or *reactive* and which directly relates to the triggering.
+Reactive suppliers are triggered once, whereas imperative ones use a polling mechanism.
+See https://docs.spring.io/spring-cloud-stream/reference/spring-cloud-stream/producing-and-consuming-messages.html#polling-configuration-properties[documentation for the polling mechanism].
+
+There are two ways to define a message key:
+
+* using `producer.partition-key-expression` or
+* (in case of Kafka) directly add a key to an outbound record.
+
+.Example of using `producer.partition-key-expression`
+[source,yaml]
+----
+spring:
+  cloud:
+    stream:
+      bindings:
+        demoData-out-0:
+          destination: demo-data-raw
+          producer:
+            partition-key-expression: headers['partitionKey'] # <1>
+            partition-count: 3
+----
+
+<1> Partition expression that instructs Spring Cloud Stream to use a Message header `partitionKey` to calculate a Kafka partition (Kafka key will not be set)
+
+.Example of adding a Kafka key to outbound record
+[source,java]
+----
+@Bean
+public Supplier<Message<String>> demoData() {
+    return () -> {
+        var ts = Instant.now().toEpochMilli();
+        var key = ((Long) (ts % 3)).toString().getBytes();
+        var payload = "Demo message; ts: %d".formatted(ts);
+        LOG.info("Message produced {}", payload);
+
+        return MessageBuilder
+                .withPayload(payload)
+                .setHeader(KafkaHeaders.KEY, key) // <1>
+                .build();
+    };
+}
+----
+
+<1> Adding a key directly to the message that will appear as a Kafka message key and not be visible in message headers
 
 ==== Function (processor)
 
@@ -246,7 +306,30 @@ public Function<String, String> toUpperCase() {
 }
 ----
 
-Topics: function compositions
+You can compose one or more functions to pipelines, so messages flow through all in given order, but code stays separated.
+Consider the below configuration example that uses two functions beans: `toUpperCase` and `addStaticString`.
+
+[source,yaml]
+----
+spring:
+  cloud:
+    function:
+      definition: toUpperCase|addStaticString                   # <1>
+    stream:
+      function:
+        bindings:
+          toUpperCase|addStaticString-in-0: processed-data-in   # <2>
+          toUpperCase|addStaticString-out-0: processed-data-out # <2>
+      bindings:
+        processed-data-in:                                      # <3>
+          destination: demo-data-raw
+        processed-data-out:                                     # <3>
+          destination: demo-data-processed
+----
+
+<1> function pipeline definition using Spring bean names
+<2> re-naming (binding) long function names to easy to use names (optional configuration)
+<3> using re-named function for Spring Cloud Stream binding
 
 ==== Consumer (sink)
 
@@ -260,7 +343,6 @@ public Consumer<String> sink() {
 ----
 
 Topics: message routing
-
 
 === Error handling
 
